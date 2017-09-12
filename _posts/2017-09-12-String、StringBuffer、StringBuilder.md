@@ -14,6 +14,7 @@ tags:
 # String
 ## String类初始化后是不可变的
 String的值是final修饰的，这代表String的值初始化后就是常量，不可改变，只能新建。
+
 ```java
 public final class String
     implements java.io.Serializable, Comparable<String>, CharSequence 
@@ -38,6 +39,7 @@ public final class String
 
 ## String常量是在常量池中的，并且常量池中的String可以被共享使用。
 常量池中的String被共享使用，达到节省内存，使数据集更小，（通常会）让程序运行更快的效果，注意：默认只有String常量(字面量常量、编译期认定的常量)会被放进常量池。
+
 ```java
 public class StringTest {
 	public static void stringStorageTest() {
@@ -116,6 +118,7 @@ public class StringTest {
 字符串声明方式包括直接使用双引号、还可以通过new关键字。
 * 直接使用双引号声明出来的String对象会存储在常量池中，以供重复使用，另外需要注意的是：JDK1.6及以前版本常量池位于 Perm Gen space 中，String对象的内存分配也在此；JDK1.7版本开始常量池搬到了 Heap space 中，String对象的内存分配自然也搬到了 Heap space 中。
 * 通过new关键字声明出来的String对象则会直接存储到 Heap space 中。
+
 ```java
 public class StringTest {
 	public static void stringStorageTest() {
@@ -151,6 +154,7 @@ public class StringTest {
 
 ## 通过intern使用常量池
 由于只有String常量默认会被放进常量池，所以针对重复使用率较高的String变量，可以通过intern方法来使用常量池，起到提升程序性能的效果。
+
 ```java
 public class StringTest {
 	static final int MAX = 1000 * 10000;
@@ -219,6 +223,7 @@ public class StringTest {
 
 }
 ```
+
 >比较结果：  
 1689ms has elapsed when intern is used.  
 5775ms has elapsed when intern is not used.  
@@ -227,6 +232,7 @@ public class StringTest {
 在使用大量字符串时，对于重复率较高的情况，采用intern效率要好很多；但是对于重复率很低的情况，反而不使用intern效率要高些，原因就是intern操作要比直接使用多一步常量池字符串检查操作，常量池起到的是缓存的作用，但重复率较低的情况导致缓存利用率也会降低，同时又多了一步缓存检查操作，效率反而会不如不使用intern的情况。 
 
 >JAVA 使用 jni 调用c++实现的StringTable的intern方法, StringTable的intern方法跟Java中的HashMap的实现是差不多的, 只是不能自动扩容。默认大小是1009。要注意的是，String的String Pool是一个固定大小的Hashtable，默认值大小长度是1009，如果放进String Pool的String非常多，就会造成Hash冲突严重，从而导致链表会很长，而链表长了后直接会造成的影响就是当调用String.intern时性能会大幅下降。在 jdk6中StringTable是固定的，就是1009的长度，所以如果常量池中的字符串过多就会导致效率下降很快,由于jdk6中常量池中的对象的内存是分配在 Perm Gen space 中的，所以如果常量池中的字符串过多，大小超过参数 -XX:MaxPermSize=256m 配置的大小，会报 java.lang.OutOfMemoryError:PermGen space 异常。在jdk7中，StringTable的长度可以通过一个参数指定：-XX:StringTableSize=99991 ,jdk7常量池由Perm Gen space搬到了Heap space，所以常量池中的对象的内存是分配在 Heap space 中的，常量池中的字符串过多，大小超过参数 -Xmx20m -XX:-UseGCOverheadLimit 配置的大小，会报 java.lang.OutOfMemoryError:java heap space 异常。
+
 ```java
 public class StringTest {
 	public static void internTestJDK8() {
@@ -285,6 +291,7 @@ public class StringTest {
 ```
 
 案例：fastjson 1.1.24之前版本进行接口读取时，在读取了近70w条数据后，日志打印变的非常缓慢，检查后发现导致变慢的原因是因为 fastjson 对String#intern方法的使用不当造成的：fastjson 中对所有的 json 的 key 使用了 intern 方法，缓存到了字符串常量池中，这样每次读取的时候就会非常快，大大减少时间和空间。而且 json 的 key 通常都是不变的。这个地方没有考虑到大量的 json key 如果是变化的，那就会给字符串常量池带来很大的负担，而log4j打印日志时使用到JVM的getStackTrace()方法，该方法中打印类名、方法名、文件名都是通过常量池访问的，常量池内数据过多时，访问效率就会受到严重影响。
+
 ```java
 package com.alibaba.fastjson.parser;
 public class SymbolTable{
@@ -298,7 +305,9 @@ public class SymbolTable{
 	}
 }
 ```
+
 这个问题 fastjson 在1.1.24版本中已经将这个漏洞修复了。程序加入了一个最大的缓存大小，超过这个大小后就不会再往字符串常量池中放了。
+
 ```java
 public static final int MAX_SIZE = 1024;
  
@@ -312,6 +321,7 @@ if (size >= MAX_SIZE) {
 StringBuffer 与 StringBuilder 中的方法和功能完全是等价的，因为他们有共同的基类AbstractStringBuilder。
 ## StringBuffer 与 StringBuilder 不同之处 
 StringBuffer 中的方法大都采用了 synchronized 关键字进行修饰，因此是线程安全的，而 StringBuilder 则没有，所以是线程不安全的。在单线程程序下， StringBuilder 效率更快，因为它不需要加锁，不具备多线程安全，而 StringBuffer 则每次都需要判断锁，效率相对更低。
+
 ```java
  public final class StringBuffer
     extends AbstractStringBuilder
@@ -353,6 +363,7 @@ abstract class AbstractStringBuilder implements Appendable, CharSequence {
 
 ## 功能实现原理
 StringBuffer 与 StringBuilder 的功能继承于 AbstractStringBuilder ， AbstractStringBuilder 中采用一个char数组来保存需要 append 的字符串，char数组有一个初始大小，当 append 的字符串长度超过当前char数组容量时，则对char数组进行动态扩展，也即重新申请一段更大的内存空间，然后将当前char数组拷贝到新的位置，因为重新分配内存并拷贝的开销比较大，所以每次重新申请内存空间都是采用申请大于当前需要的内存空间的方式，这里是2倍。
+
 ```java
 abstract class AbstractStringBuilder implements Appendable, CharSequence {
     char[] value;
@@ -392,6 +403,7 @@ abstract class AbstractStringBuilder implements Appendable, CharSequence {
 ```
 
 # String、StringBuffer、StringBuilder性能比较
+
 ```java
 public class StringTest {
 
@@ -439,6 +451,7 @@ public class StringTest {
 
 }
 ```
+
 >比较结果：  
 866 millis has elapsed when used String.   
 64 millis has elapsed when used StringBuffer.   
