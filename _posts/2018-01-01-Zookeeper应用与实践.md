@@ -116,6 +116,18 @@ TCP长连接，通过心跳检测会话是否存活。
 * sync
 * delete
 * quit
+#### 检查dubbo服务情况
+```
+## 1.登录到zookeeper任意节点，找到zookeeper安装路径
+whereis zookeeper
+## 2.转到控制脚本目录
+cd /usr/local/zookeeper/zk/bin/
+## 3.登录zookeeper客户端
+sh zkCli.sh -server 127.0.0.1:2181
+## 4.查看服务列表
+ls /dubbo
+
+```
 
 ### Watcher(同步实现)
 
