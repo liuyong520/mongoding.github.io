@@ -3,7 +3,7 @@ layout: post
 title: String、StringBuffer、StringBuilder
 subtitle: 详细介绍String、StringBuffer、StringBuilder,java字符串技术及相关原理。
 date: 2017-09-12
-author: chengweii
+author: dingzhenhao
 header-img: img/post-bg-hacker.jpg
 catalog: true
 tags:
