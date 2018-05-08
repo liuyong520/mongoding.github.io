@@ -3,7 +3,7 @@ layout: post
 title: Zookeeper应用与实践
 subtitle: 详细介绍Zookeeper的应用与实践
 date: 2018-01-01
-author: dingzhenhao
+author: mongoding
 header-img: img/post-bg-hacker.jpg
 catalog: true
 tags:

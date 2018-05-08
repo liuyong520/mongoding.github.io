@@ -4,7 +4,7 @@ SEOTitle: My Tec Blog
 header-img: img/post-bg-desk.jpg
 email: topviptop@qq.com
 description: "It's worth doing just one thing for a lifetime."
-keyword: "dingzhenhao, My Tec Blog, topviptop, java,编程,丁振豪,猴子爱喝酒,丁俊豪"
+keyword: "mongoding, My Tec Blog, topviptop, java,编程,猴子爱玩耍,分布式"
 url: "https://mongoding.github.io"          # your host, for absolute URL
 baseurl: ""      # for example, '/blog' if your blog hosted on 'host/blog'
 github_repo: "https://github.com/mongoding/mongoding.github.io" # you code repository
@@ -18,12 +18,12 @@ sidebar-avatar: /img/about-BY-gentle.jpg      # use absolute URL, seeing it's us
 
 # SNS settings
 RSS: false
-# weibo_username:     dingzhenhao
+# weibo_username:     mongoding
 zhihu_username:     ding-jun-hao-88
 github_username:    mongoding
-facebook_username:  dingzhenhao
+facebook_username:  mongoding
 jianshu_username:   6d3f2428fb0a
-#twitter_username:   dingzhenhao
+#twitter_username:   mongoding
 
 
 
@@ -57,7 +57,7 @@ kramdown:
 
 # 评论系统
 # Disqus settings（https://disqus.com/）
-disqus_username: dingzhenhao
+disqus_username: mongoding
 
 # Analytics settings
 # Baidu Analytics
