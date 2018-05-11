@@ -1676,12 +1676,14 @@ Node count: 4
 
    无管理界面：
 
-　　docker run --hostname rabbit-host --name rabbit -d -p 5672:5672 rabbitmq
+　　docker run --localhost rabbit-host --name rabbit -d -p 5672:5672 rabbitmq
 
 　　有管理界面：
 
-　　docker run --hostname rabbit-host --name rabbit -d -p 5672:5672 -p 15672:15672 rabbitmq:management
+　　docker run --localhost rabbit-host --name rabbit -d -p 5672:5672 -p 15672:15672 rabbitmq:management
 
+    账号：guest 密码：guest
+    
 ##  十四 、启动Eureka
 
 
