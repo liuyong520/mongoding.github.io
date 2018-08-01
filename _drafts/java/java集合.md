@@ -128,6 +128,19 @@ public class ArrayList<E> extends AbstractList<E>
 * 基于数组快速随机访问的特性，ArrayList非常适合于高频读取的场景；但由于数组容量不足而自动扩容的机制导致ArrayList的写能力会受数据容量不确定性的影响。
 * 由于数组容量不足而自动扩容的机制会造成性能损耗，在实际添加大量元素前，可以提前预估并指定ArrayList实例的容量，或者通过调用ensureCapacity()方法来手动增加ArrayList实例的容量，以减少递增式再扩容导致的性能损耗。
 * ArrayList未实现同步，是非线程安全的，所以在多线程场景下建议使用CopyOnWriteArrayList。
+* ArrayList.Iterator.remove() 能在循环中删除数据，每次删除完数据操作后，重新把目标集合的modCount 赋给了迭代器的expectedModCount
+* 对于基于数组实现的集合，删除数据，插入数据会有数据移位操作，影响性能。
+
+#### ArrayList.SubList
+1，该方法返回的是父list的一个视图，从fromIndex（包含），到toIndex（不包含）。fromIndex=toIndex 表示子list为空
+
+2，父子list做的非结构性修改（non-structural changes）都会影响到彼此：所谓的“非结构性修改”，是指不涉及到list的大小改变的修改。相反，结构性修改，指改变了list大小的修改。
+
+3，对于结构性修改，子list的所有操作都会反映到父list上。但父list的修改将会导致返回的子list失效。
+
+4，tips：如何删除list中的某段数据：
+
+list.subList(from, to).clear();
 
 ### Vector
 Vector内部与ArrayList大致相同，但该类实现了同步，是ArrayList的线程安全版本实现。
@@ -225,13 +238,15 @@ public static void main(String[] args) {
 }
 ```
 
-* ArrayList的线程安全版本除了Vector之外，还可以通过Collections.synchronizedList方法生成同步代理对象获得线程安全的功能。
+* ArrayList的线程安全版本除了Vector之外，还可以通过Collections.synchronizedList方法生成同步代理对象获得线程安全的功能（其实现是把原集合包装成了新的同步集合）。
 * 尽管Vector是同步的，但其由于在操作上大量使用synchronized关键字,这种方式严重影响效率,在多线程场景下，还是推荐使用CopyOnWriteArrayList。(注意CopyOnWriteArrayList的实现机制，导致它只能保证数据最终一致性，无法保证实时一致；还有比较占用内存，容易引发GC问题，所以请慎重使用。)
+*即使 Vector方法有synchronized关键字，对于每个方法是线程安全的，是原子的，但是使用不当人存在线程安全问题，如类似：Vector.set(0,Vector.get(0)+1)，
+Vector只保证自身方法操作的原子性。
 
 ### LinkedList
 LinkedList是基于双向链表实现的。  
 基于链表数据结构的特性，LinkedList的插入删除操作性能表现优异，但是随机访问能力很差。  
-LinkedList无容量限制。  
+LinkedList无容量限制（不存在扩容拷贝数据问题）。  
 LinkedList允许null元素。  
 LinkedList还实现了Deque接口，可用作堆栈、队列或双端队列。  
 注意，LinkedList未实现同步，是非线程安全的。
@@ -376,7 +391,8 @@ public class Test {
 
 * 因为CopyOnWrite的写时复制机制，所以在进行写操作的时候，内存里会同时驻扎两个对象的内存，旧的对象和新写入的对象，容易引起内存问题。
 * CopyOnWriteArrayList只能保证数据的最终一致性，不能保证数据的实时一致性。所以如果你希望写入的的数据，马上能读到，请不要使用CopyOnWriteArrayList。
-* CopyOnWriteArrayList虽然是线程安全的，但是只是一种相对的线程安全而不是绝对的线程安全，它只能够保证增、删、改、查的单个操作一定是原子的，不会被打断，但是如果组合起来用，并不能保证线程安全性。要保证遍历的安全性，必须通过迭代器遍历的方式，因为通过迭代器遍历依赖的是某一时刻的容器数组对象(snapshot)，该对象的数据不会发生变化。  
+* CopyOnWriteArrayList虽然是线程安全的，但是只是一种相对的线程安全而不是绝对的线程安全，它只能够保证增、删、改、查的单个操作一定是原子的，不会被打断，但是如果组合起来用，并不能保证线程安全性。
+*要保证遍历的安全性，必须通过迭代器遍历的方式，因为通过迭代器遍历依赖的是某一时刻的容器数组对象(snapshot，对于ArrayList 迭代器并没有提供快照)，该对象的数据不会发生变化。  
 
 ```java
 public class Test {
@@ -469,13 +485,17 @@ public class CopyOnWriteArrayList<E>
 }
 ```
 
-### [整理中]CopyOnWriteArraySet
+### CopyOnWriteArraySet（类似CopyOnWriteArraySet）
 
-#### 实现原理
-
-#### 使用注意
 
 ## 队列
+队列是一种非常常用的数据结构，一进一出，先进先出。 
+
+　　在Java并发包中提供了两种类型的队列，非阻塞队列与阻塞队列，当然它们都是线程安全的，无需担心在多线程并发环境所带来的不可预知的问题。为什么会有非阻塞和阻塞之分呢？这里的非阻塞与阻塞在于有界与否，也就是在初始化时有没有给它一个默认的容量大小，对于阻塞有界队列来讲，如果队列满了的话，则任何线程都会阻塞不能进行入队操作，反之队列为空的话，则任何线程都不能进行出队操作。而对于非阻塞无界队列来讲则不会出现队列满或者队列空的情况。它们俩都保证线程的安全性，即不能有一个以上的线程同时对队列进行入队或者出队操作。 
+
+　　非阻塞队列：ConcurrentLinkedQueue 
+
+　　阻塞队列：ArrayBlockingQueue、LinkedBlockingQueue、……
 
 ### Stack
 Stack类表示后进先出（LIFO）的对象堆栈。  
@@ -521,8 +541,10 @@ public class Stack<E> extends Vector<E> {
 }
 ``` 
 
+
 #### 使用注意
 * 由于自身功能基本靠继承Vector实现，所以Vector存在的问题Stack也同样存在。所以，如果你要使用栈做类似的业务.那么单线程的你可以选择LinkedList,多线程情况你可以选择非阻塞队列ConcurrentLinkedQueue或者阻塞队列BlockingQueue。  
+
 
 ### [整理中]ConcurrentLinkedQueue
 ConcurrentLinkedQueue是一个基于链接节点的无界线程安全队列，它采用先进先出的规则对节点进行排序，当我们添加一个元素的时候，它会添加到队列的尾部，当我们获取一个元素时，它会返回队列头部的元素。该队列为单向队列，对应双向队列的实现是ConcurrentLinkedDeque。基于CAS的“wait－free”（常规无等待）来实现，CAS并不是一个算法，它是一个CPU直接支持的硬件指令，这也就在一定程度上决定了它的平台相关性。
@@ -1185,3 +1207,4 @@ ArrayList 和Vector是采用数组方式存储数据，此数组元素数大于�
 而在treeMap中，同样的值的map,顺序不同,equals时，true，说明，treeMap在equals()时是整理了顺序了的。
 
 ## HashTable与HashMap
+
