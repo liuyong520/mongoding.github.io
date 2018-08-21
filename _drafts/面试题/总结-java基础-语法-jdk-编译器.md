@@ -10,8 +10,8 @@
 
 *   若hashcode方法永远返回1或者一个常量会产生什么结果？ 
 
-*   Java Collections和Arrays的sort方法默认的排序方法是什么； 
 
+*   Java Collections和Arrays的sort方法默认的排序方法是什么； 
 
 *   浅拷贝和深拷贝的区别； 
 
